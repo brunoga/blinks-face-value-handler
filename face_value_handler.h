@@ -1,3 +1,6 @@
+#ifndef FACE_VALUE_HANDLER_H_
+#define FACE_VALUE_HANDLER_H_
+
 #include <blinklib.h>
 
 class FaceValueHandler;
@@ -87,3 +90,5 @@ class FaceValueHandler {
 
   byte offsets_[];
 };
+
+#endif  // FACE_VALUE_HANDLER_H_
