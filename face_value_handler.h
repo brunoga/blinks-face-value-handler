@@ -35,7 +35,9 @@ class FaceValueHandler {
   // then the default behavior of propagating changes to all faces will be used.
   // The offset parameter is a variadic one (you can add multiple values) and
   // define the offsets of each field in the face value. The offsets MUST be
-  // provided in increasing order and the highest one should be smaller than 6.
+  // provided in increasing order and the highest one should be smaller than 6
+  // (if using the official BlinkLib) or smaller than 8 (if using the custom
+  // BlinkLib).
   template <typename... Offsets>
   FaceValueHandler(ChangeCallback change_callback, Offsets... offsets)
       : change_callback_(change_callback),
