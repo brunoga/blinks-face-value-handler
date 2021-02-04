@@ -3,6 +3,12 @@
 
 #include <blinklib.h>
 
+#ifdef BGA_CUSTOM_BLINKLIB
+#define FACE_VALUE_BITS 8
+#else
+#define FACE_VALUE_BITS 6
+#endif
+
 class FaceValueHandler;
 
 // Prototype for functions that want to respond to any changes in data coming
@@ -32,7 +38,8 @@ class FaceValueHandler {
   // provided in increasing order and the highest one should be smaller than 6.
   template <typename... Offsets>
   FaceValueHandler(ChangeCallback change_callback, Offsets... offsets)
-      : change_callback_(change_callback), offsets_{(byte)offsets..., 6} {
+      : change_callback_(change_callback),
+        offsets_{(byte)offsets..., FACE_VALUE_BITS} {
     FOREACH_FACE(face) {
       byte current_face_value = getLastValueReceivedOnFace(face);
 
