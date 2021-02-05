@@ -18,8 +18,9 @@ byte FaceValueHandler::GetInputFieldValue(byte face, byte field_index) {
 
 void FaceValueHandler::SetOutputFieldValue(byte face, byte field_index,
                                            byte value) {
-  byte mask =
-      ((byte)255 << (offsets_[field_index + 1] - offsets_[field_index]));
+  byte mask = (byte)255 &
+              ~((((offsets_[field_index + 1] - offsets_[field_index]) << 1) - 1)
+                << offsets_[field_index]);
   output_face_values_[face] &= mask;
   output_face_values_[face] |= (value << offsets_[field_index]);
 }
