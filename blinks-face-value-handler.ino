@@ -38,29 +38,33 @@ void loop() {
   bool white_face_0 =
       face_value_handler.GetOutputFieldValue(0, INDEX_WHITE_FACE_0);
 
-  // Did this Blink just woke up?
-  if (!hasWoken()) {
-    // Nope. So lets check if a button was clicked.
-    if (buttonSingleClicked()) {
-      // Button clicked. Advance game mode (wrapping around at 4 so the possible
-      // values are 0 to 3 inclusive).
-      game_mode = (game_mode + 1) % 4;
+  // Make sure we consume all 2 of the flags below in case we have just waken
+  // up. Note that consuming double clicks does not work as expected as it needs
+  // two loop iterations at least to be detected and hasWoken() will only return
+  // true in the first one.
+  bool has_woken = hasWoken();
+  bool button_single_clicked = buttonSingleClicked();
 
-      // As we updated the game mode, we also need to update it in all output
-      // faces.
-      face_value_handler.SetOutputFieldValueOnAllFaces(INDEX_GAME_MODE,
-                                                       game_mode);
-    }
+  // Was this Blink button clicked and it was not to wake it up?
+  if (!has_woken && button_single_clicked) {
+    // Advance game mode (wrapping around at 4 so the possible values are 0 to 3
+    // inclusive).
+    game_mode = (game_mode + 1) % 4;
 
-    // Let's also check if the button was double clicked.
-    if (buttonDoubleClicked()) {
-      // It was. Invert the state of white_face_0.
-      white_face_0 = !white_face_0;
+    // As we updated the game mode, we also need to update it in all output
+    // faces.
+    face_value_handler.SetOutputFieldValueOnAllFaces(INDEX_GAME_MODE,
+                                                     game_mode);
+  }
 
-      // And update it in all faces.
-      face_value_handler.SetOutputFieldValueOnAllFaces(INDEX_WHITE_FACE_0,
-                                                       white_face_0);
-    }
+  // Let's also check if the button was double clicked.
+  if (buttonDoubleClicked()) {
+    // It was. Invert the state of white_face_0.
+    white_face_0 = !white_face_0;
+
+    // And update it in all faces.
+    face_value_handler.SetOutputFieldValueOnAllFaces(INDEX_WHITE_FACE_0,
+                                                     white_face_0);
   }
 
   // Render Blink color based on current game mode.
