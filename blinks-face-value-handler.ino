@@ -19,6 +19,33 @@
 
 void setup() {}
 
+static bool white_face_0_;
+static const byte opposite_face_[] = {3, 4, 5, 0, 1, 2};
+
+// Callback for processing changes to fields in face values.
+bool change_callback(byte face, byte field_index,
+                     FaceValueHandler* face_value_handler) {
+  switch (field_index) {
+    case INDEX_GAME_MODE:
+      // For the game mode we will simply use the default behavior. We did not
+      // have to put it here in the switch but as this is an example, we did it
+      // to make it explicit.
+      break;
+    case INDEX_WHITE_FACE_0:
+      // For the white face 0 state we want to check if we should switch our
+      // face 0 on or not.
+      white_face_0_ = face_value_handler->GetInputFieldValue(face, field_index);
+
+      // We only propagate the state to the opposite face.
+      face_value_handler->SetOutputFieldValue(opposite_face_[face], field_index,
+                                              white_face_0_);
+
+      return true;
+  }
+
+  return false;
+}
+
 void loop() {
   // Create an instance of our FaceValueHandler. As it has no callback, it will
   // automatically propagate to all faces any changes detected in any faces.
@@ -27,7 +54,7 @@ void loop() {
   //
   // We have 2 pieces of data (fields) we are tracking: the game mode and if we
   // want face 0 to be white. So we pass the 2 associated offsets here.
-  FaceValueHandler face_value_handler(nullptr, OFFSET_GAME_MODE,
+  FaceValueHandler face_value_handler(change_callback, OFFSET_GAME_MODE,
                                       OFFSET_WHITE_FACE_0);
 
   // Instantiating the FaceValueHandler above already propagated any changes to
@@ -35,8 +62,6 @@ void loop() {
   // need to check the value of the game mode and white face 0 fields in any of
   // the output faces. We use face 0 here but it could have been any other face.
   byte game_mode = face_value_handler.GetOutputFieldValue(0, INDEX_GAME_MODE);
-  bool white_face_0 =
-      face_value_handler.GetOutputFieldValue(0, INDEX_WHITE_FACE_0);
 
   // Make sure we consume all 2 of the flags below in case we have just waken
   // up. Note that consuming double clicks does not work as expected as it needs
@@ -60,11 +85,11 @@ void loop() {
   // Let's also check if the button was double clicked.
   if (buttonDoubleClicked()) {
     // It was. Invert the state of white_face_0.
-    white_face_0 = !white_face_0;
+    white_face_0_ = !white_face_0_;
 
     // And update it in all faces.
     face_value_handler.SetOutputFieldValueOnAllFaces(INDEX_WHITE_FACE_0,
-                                                     white_face_0);
+                                                     white_face_0_);
   }
 
   // Render Blink color based on current game mode.
@@ -84,7 +109,7 @@ void loop() {
   }
 
   // Should we render face 0 as white?
-  if (white_face_0) {
+  if (white_face_0_) {
     // Yes. Do it.
     setColorOnFace(WHITE, 0);
   }
