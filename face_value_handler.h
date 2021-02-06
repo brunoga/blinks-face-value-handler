@@ -58,7 +58,7 @@ class FaceValueHandler {
 
         if (previous_field_value != current_field_value) {
           // Field changed process it.
-          if (change_callback == nullptr ||
+          if (change_callback_ == nullptr ||
               !change_callback_(face, field_index, this)) {
             // Either we do not have a callback or we have it but it returned
             // false. Propagate changes to all faces.
@@ -97,7 +97,7 @@ class FaceValueHandler {
 
   ChangeCallback change_callback_;
 
-  byte offsets_[];
+  byte offsets_[FACE_VALUE_BITS];
 };
 
 #endif  // FACE_VALUE_HANDLER_H_
